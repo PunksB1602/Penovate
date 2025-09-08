@@ -1,4 +1,4 @@
-# Penovate: Smart Pen for Digital Handwriting
+# Penovate: A Sensor-Equipped Pen for Writing on Paper with Digital Conversion using CNN-LSTM Model
 
 This project implements a smart pen system that captures handwriting on paper and converts it into digital text in real time. The system integrates motion sensors, a microcontroller, and a CNN-LSTM deep learning model to recognize characters from pen movements.
 
