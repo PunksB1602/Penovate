@@ -48,8 +48,6 @@ The Penovate system consists of four layers:
 - **HC-05 Bluetooth module** – wireless transmission to host machine.  
 - **Li-ion battery (2S, 7.4V)** – portable power source.  
 
-> See `hardware/` for schematics, wiring diagrams, and power considerations.  
-
 ---
 
 ### 2.2 Firmware Functionality
@@ -82,8 +80,6 @@ The Penovate system consists of four layers:
   - Pressure (scalar)  
 - **Sampling frequency**: 100 Hz.  
 - **Samples**: ~130 per class, multiple writers.  
-
-> Data collection scripts: `dataset_collect.py`, `combine_json.py`, `to_npy.py`.  
 
 ---
 
