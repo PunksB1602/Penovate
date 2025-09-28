@@ -1,112 +1,144 @@
 # Penovate: A Sensor-Equipped Pen for Digital Handwriting Recognition
 
-**Penovate** is a smart pen system that captures handwriting on ordinary paper and converts it into digital text in real time.  
-It integrates **motion and pressure sensors**, a **microcontroller with Bluetooth**, and a **CNN–BiLSTM deep learning model** to recognize handwritten characters from sensor streams.
+This repository contains the implementation of **Penovate**, a hardware–software system designed to capture handwriting on ordinary paper using motion and pressure sensors, and convert it into digital text using a **CNN–BiLSTM model**.
+
+The project integrates **embedded hardware** for data acquisition, a **signal processing pipeline** for preprocessing, and a **deep learning model** for recognition. This README provides the technical details, experimental results, and instructions to reproduce the system.
 
 ---
 
-## 📌 Background & Motivation
+## 1. Background and Motivation
 
-Digital handwriting recognition has traditionally relied on **touchscreens, graphics tablets, or optical scanning (OCR)**.  
-While effective, these approaches require specialized surfaces or post-processing.  
+Handwriting recognition has been studied extensively, with approaches ranging from **optical character recognition (OCR)** on scanned documents to **stylus-based digitizers** on tablets. However, most existing systems have limitations:
 
-Penovate addresses this gap by enabling **direct handwriting capture on any surface using a pen-shaped device**.  
-The system combines **low-cost IMUs + pressure sensing** with a **neural sequence model**, making it portable, low-power, and extensible.
+- OCR requires scanning or imaging, which is not real-time.  
+- Stylus-based systems require specialized touchscreens or tablets.  
+- Existing smart pens are often proprietary and expensive.
+
+**Objective**: Develop an **open, low-cost, portable pen device** that enables handwriting capture on ordinary paper and converts it into digital characters in real time.  
+
+**Key idea**: Use **inertial measurement units (IMUs)** to capture motion, an **FSR sensor** to detect strokes, and **deep sequence models** to recognize characters from the resulting time-series data.
 
 ---
 
-## 🖼 System Overview
+## 2. System Overview
 
-**Architecture Workflow**:
+The Penovate system consists of four layers:
 
 1. **Hardware Layer**  
-   - Two MPU-6050 IMUs record 6-DOF motion/orientation.  
-   - An FSR detects pen–paper contact.  
-   - Arduino Nano collects and transmits data via HC-05 Bluetooth.  
+   - A pen prototype equipped with sensors and Bluetooth module.  
+   - Handles data acquisition during handwriting.  
 
-2. **Preprocessing Layer**  
-   - Noise filtering (Butterworth low-pass).  
-   - Stroke segmentation using pressure thresholding.  
-   - Normalization & zero-padding for fixed-length input.  
+2. **Firmware Layer**  
+   - Arduino Nano firmware for synchronizing and transmitting IMU + FSR data.  
 
-3. **Recognition Layer**  
-   - CNN extracts local spatial features.  
-   - BiLSTM models temporal dependencies.  
-   - Softmax classifier outputs characters (A–Z).  
+3. **Data Pipeline Layer**  
+   - Preprocessing: filtering, segmentation, normalization.  
+   - Converts raw sensor streams into fixed-length sequences.  
 
-4. **Application Layer**  
-   - Real-time display of predicted characters in console or GUI.  
-   - Data storage in structured datasets (JSON/CSV).  
+4. **Recognition Layer**  
+   - A CNN–BiLSTM deep learning model trained to classify characters A–Z.  
 
 ---
 
-## 🔧 Hardware Design
+### 2.1 Hardware Components
 
-- **Arduino Nano (ATmega328p)** – microcontroller for acquisition  
-- **MPU-6050 IMU × 2** – motion/orientation capture  
-- **FSR sensor** – pressure-based stroke detection  
-- **HC-05 Bluetooth module** – wireless communication  
-- **Li-ion battery (7.4V, 2S)** – portable power supply  
+- **Arduino Nano (ATmega328p)** – microcontroller for acquisition.  
+- **Two MPU-6050 IMUs** – capture accelerometer and gyroscope signals.  
+- **Force-Sensitive Resistor (FSR)** – detects pen–paper contact and stroke boundaries.  
+- **HC-05 Bluetooth module** – wireless transmission to host machine.  
+- **Li-ion battery (2S, 7.4V)** – portable power source.  
 
-📂 See [`hardware/`](hardware) for:
-- Schematics & wiring tables  
-- AD0/I²C addressing clarification (0x68 for AD0=GND, 0x69 for AD0=VCC)  
-- Power design notes  
+> See `hardware/` for schematics, wiring diagrams, and power considerations.  
 
 ---
 
-## 📊 Dataset & Preprocessing
+### 2.2 Firmware Functionality
 
-- **Collection protocol**  
-  - Recorded at fixed sampling rate (100 Hz)  
-  - Multiple writers contributed samples for all 26 letters (A–Z)  
-  - Stroke segmentation triggered by FSR pressure  
-
-- **Preprocessing steps**  
-  - Low-pass Butterworth filter for noise removal  
-  - Relative motion calculation between dual IMUs  
-  - Sequence normalization and zero-padding  
-
-- **Dataset statistics**  
-  - ~130 samples per character per writer  
-  - Stored as JSON sequences (accelerometer, gyroscope, pressure)  
-
-📂 Available in [`data/`](data).
+- Initializes I²C communication with two MPU-6050 sensors (addresses `0x68` and `0x69`).  
+- Reads accelerometer and gyroscope data at fixed frequency (100 Hz).  
+- Reads pressure data from FSR.  
+- Formats sensor data into structured packets.  
+- Streams packets over serial/Bluetooth to the host computer.  
 
 ---
 
-## 🤖 Model Architecture
+### 2.3 Data Processing Pipeline
 
-- **CNN layers** – extract spatial features from motion sequences  
-- **BiLSTM layers** – capture temporal handwriting patterns  
-- **Fully Connected + Softmax** – classify 26 English letters  
-
-**Training setup**:  
-- Optimizer: Adam, lr=0.001, decay every 10 epochs  
-- Loss: Categorical Cross-Entropy  
-- Epochs: 30  
-- Batch size: 32  
-- Framework: PyTorch  
-
-📂 Implementation in [`models/`](models).  
-📓 Jupyter notebooks in [`notebooks/`](notebooks).  
+1. **Acquisition**: Sensor streams (accelerometer, gyroscope, pressure).  
+2. **Filtering**: Low-pass Butterworth filter removes high-frequency noise.  
+3. **Segmentation**: Pressure threshold from FSR marks stroke start/end.  
+4. **Normalization**: Sensor values scaled to unit range.  
+5. **Padding**: Sequences zero-padded to fixed length for batching.  
 
 ---
 
-## 📈 Results
+## 3. Dataset
 
-- **Character-level accuracy**: 93.2% (with batch normalization)  
-- **Without batch normalization**: 78.7%  
-- **Metrics reported**: Accuracy, Precision, Recall, F1-score  
+- **Classes**: 26 uppercase English letters (A–Z).  
+- **Format**: JSON (per character sequence) → converted to NumPy `.npy`.  
+- **Signals recorded**:  
+  - Accelerometer (x, y, z)  
+  - Gyroscope (x, y, z)  
+  - Pressure (scalar)  
+- **Sampling frequency**: 100 Hz.  
+- **Samples**: ~130 per class, multiple writers.  
 
-**Key Observations**:  
-- CNN–BiLSTM significantly outperformed CNN-only and LSTM-only baselines  
-- Batch normalization stabilized training and improved generalization  
-- Errors mainly occurred on visually similar characters (e.g., M vs N, C vs G)  
-
-📂 See [`results/`](results) for plots, training curves, and confusion matrices.
+> Data collection scripts: `dataset_collect.py`, `combine_json.py`, `to_npy.py`.  
 
 ---
 
-## 📂 Repository Structure
+## 4. Model
 
+### 4.1 Architecture
+
+- **Input**: Sequence of 7 features (acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z, pressure).  
+- **CNN layers**:  
+  - 1D convolutions extract local spatial/temporal features.  
+- **BiLSTM layers**:  
+  - Capture sequential handwriting dynamics in both forward and backward directions.  
+- **Fully Connected Layer + Softmax**:  
+  - Outputs class probabilities for 26 characters.  
+
+### 4.2 Training Setup
+
+- Loss: Categorical cross-entropy.  
+- Optimizer: Adam (lr=0.001, decay after 10 epochs).  
+- Epochs: 30.  
+- Batch size: 32.  
+- Framework: PyTorch.  
+
+---
+
+## 5. Experiments and Results
+
+Two main experiments were conducted:
+
+- **Result 1**: Training with batch size 32, **without batch normalization**  
+  - Accuracy: ~78.7%  
+  - Issues: Slower convergence, overfitting on some classes.  
+
+- **Result 2**: Training with batch size 32, **with batch normalization**  
+  - Accuracy: ~93.2%  
+  - Improvement: Faster convergence, better generalization.  
+
+### Metrics
+
+- Accuracy, precision, recall, F1-score.  
+- Confusion matrices for all 26 classes.  
+
+### Observations
+
+- Batch normalization significantly improved stability and accuracy.  
+- Most misclassifications occurred between visually or motion-similar letters (e.g., M vs N, C vs G).  
+- Recognition works reliably for isolated characters, but continuous words/sentences remain challenging.  
+
+---
+
+## 6. Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/PunksB1602/Penovate_Minor_Project.git
+cd Penovate_Minor_Project
+pip install -r requirements.txt
