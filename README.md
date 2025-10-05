@@ -1,4 +1,4 @@
-# Penovate: A Sensor-Equipped Pen for Digital Handwriting Recognition
+# Penovate: A Sensor-Equipped Pen for Writing on Paper with Digital Conversion Using CNN-LSTM Model
 
 This repository contains the implementation of **Penovate**, a hardware–software system designed to capture handwriting on ordinary paper using motion and pressure sensors, and convert it into digital text using a **CNN–BiLSTM model**.
 
