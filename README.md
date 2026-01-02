@@ -146,7 +146,7 @@ pip install -r requirements.txt
 ```
 ---
 
-## 7. ## Contact
+## 7. Contact
 For any inquiries or feedback, please reach out to:
 
 - **Subham Gautam**: gautamsubham65@gmail.com
