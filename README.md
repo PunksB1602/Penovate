@@ -4,6 +4,11 @@ This repository contains the implementation of **Penovate**, a hardware–softwa
 
 The project integrates **embedded hardware** for data acquisition, a **signal processing pipeline** for preprocessing, and a **deep learning model** for recognition. This README provides the technical details, experimental results, and instructions to reproduce the system.
 
+## Project Team
+- **Pankaj Bhatt (THA078BEI025)**
+- **Pratik Pokharel (THA078BEI027)**
+- **Subham Gautam (THA078BEI042)**
+
 ---
 
 ## 1. Background and Motivation
@@ -138,3 +143,12 @@ Clone the repository and install dependencies:
 git clone https://github.com/PunksB1602/Penovate_Minor_Project.git
 cd Penovate_Minor_Project
 pip install -r requirements.txt
+```
+---
+
+## 7. ## Contact
+For any inquiries or feedback, please reach out to:
+
+- **Subham Gautam**: gautamsubham65@gmail.com
+- **Pratik Pokharel**: pratikpokhrel14@gmail.com
+- **Pankaj Bhatt**: pbecie16@gmail.com
