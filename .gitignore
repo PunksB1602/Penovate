@@ -42,9 +42,13 @@ coverage.xml
 .mypy_cache/
 .dmypy.json
 .vscode/
-.DS_Store
 Thumbs.db
-# Keep only result.txt in outputs
+
+*.pth
+*.npy
 outputs/
 !outputs/result.txt
+outputs/
+!outputs/result.txt
+
 # imu_dataset/
