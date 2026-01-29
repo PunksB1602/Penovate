@@ -187,7 +187,7 @@ def main():
 
                 choice = input("Choice (1-3): ")
                 if choice == '1':
-                    char = input("Enter character: ").upper()
+                    char = input("Enter character: ").lower()
                     if len(char) != 1:
                         print("Enter a single character")
                         continue
