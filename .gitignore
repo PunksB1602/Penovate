@@ -1,10 +1,15 @@
 __pycache__/
 *.py[cod]
-# Ignore .pth and .npy files in outputs, but keep other files
+
+*.json
+*.npy
+
+!imu_dataset/*.json
+!imu_dataset/*.npy
+
 outputs/*.pth
 outputs/**/*.pth
 outputs/*.npy
 outputs/**/*.npy
-# Do not ignore outputs folder or other files
-!outputs/
-!outputs/result.txt
+
+
