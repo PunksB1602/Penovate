@@ -1,15 +1,23 @@
-# Penovate: Real-Time Handwriting Recognition with a Sensor-Equipped Pen
 
-Penovate is an open-source hardware–software system for capturing handwriting on ordinary paper using a custom sensor-equipped pen and converting it into digital text using a deep learning model (CNN–BiLSTM). The project covers the full stack: embedded hardware, firmware, data processing, and neural network recognition.
+
+# Penovate: Handwriting Recognition (Single Character Focus) with a Sensor-Equipped Pen
+
+Penovate is a hardware–software system for recognizing handwritten characters (a–z) written on ordinary paper, using a custom sensor-equipped pen and a deep learning model. The system is primarily designed and optimized for isolated single-character recognition, but may also work for continuous word or sequence input (with reduced accuracy, as this is not the main use case).
+
 
 **Key Features:**
 - Low-cost, portable pen device with IMU and FSR sensors
 - Real-time data acquisition and Bluetooth transmission
 - Signal processing and segmentation pipeline
-- Deep learning model for character recognition (a–z)
+- Deep learning models for single-character recognition (CNN-BiLSTM, with/without BatchNorm)
+- May work for continuous words, but not optimized for that use case
 - Reproducible experiments and results
 
-This README provides a comprehensive overview, including hardware details, data pipeline, model architecture, training setup, results, and usage instructions.
+**Model Names:**
+- `CNN_BiLSTM`: Main model for single-character recognition, combining convolutional and bidirectional LSTM layers
+- Experiments include versions with and without Batch Normalization for comparison
+
+This README provides a detailed overview of the hardware, firmware, data pipeline, model architecture, training setup, results, and usage instructions for single-character recognition.
 
 ---
 
@@ -50,24 +58,37 @@ The Penovate system consists of four layers:
    - Converts raw sensor streams into fixed-length sequences.  
 
 4. **Recognition Layer**  
-   - A CNN–BiLSTM deep learning model trained to classify characters A–Z.  
+   - A CNN–BiLSTM deep learning model trained to classify characters a–z.  
 
 ---
 
 ## Project Folder Structure
 
-```
+
+Project folder structure:
+
 Penovate_Minor_Project/
-├── data/                  # Processed and raw sensor data
-│   └── processed_imu/     # Final .npy and .json files for training
-├── results/               # Model checkpoints, logs, and plots
-├── model.ipynb            # Main model development notebook
-├── hybrid_CNN_BiLSTM.ipynb# Full experiment notebook
-├── combine_json.py        # Data conversion scripts
-├── predict.py, predict_gui.py # Inference scripts
-├── README.md, LICENSE     # Documentation and license
+│
+├── data/
+│   ├── imu_dataset/
+│   └── processed_imu/
+│
+├── results/
+│
+├── scripts/
+│
+├── model.ipynb
+├── hybrid_CNN_BiLSTM.ipynb
+├── README.md, LICENSE
 └── ...
-```
+
+Explanation:
+- The `data/imu_dataset/` folder contains all raw and preprocessed character samples, with each character's data stored in a separate JSON file (e.g., `a_lower.json`).
+- The `data/processed_imu/` folder contains the final NumPy arrays and label files used for model training.
+- The `results/` folder stores model checkpoints, training logs, plots, and evaluation outputs.
+- The `scripts/` folder contains Python scripts for data collection, preprocessing, and other utilities.
+- The main Jupyter notebooks (`model.ipynb`, `hybrid_CNN_BiLSTM.ipynb`) contain the model code and experiments.
+- The root folder also includes documentation and license files.
 
 ---
 
@@ -182,7 +203,7 @@ See `hybrid_CNN_BiLSTM.ipynb` and `model.ipynb` for full PyTorch implementation,
 
 ## 5. Experiments and Results
 
-### Latest Experiments (Batch Size 32, Dropout 0.5, Seeded)
+### Experiments (Batch Size 32, Dropout 0.5, Seeded)
 
 | Experiment | BatchNorm | Test Loss | Test Accuracy | Macro F1 |
 |-----------|-----------|-----------|--------------|----------|
